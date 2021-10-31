@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>BillSpliter</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- Drop Box -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
+
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="resources/js/AddExpense.js"></script>
+
+    <!--Smart Wizard-->
+    <link href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/smart_wizard.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/smart_wizard_theme_arrows.min.css"
+        rel="stylesheet" type="text/css" />
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/jquery.smartWizard.min.js"></script>
+
+    <style>
+        table.table th i {
+            font-size: 13px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        table.table td a.add {
+            color: #27C46B;
+        }
+
+        table.table td a.edit {
+            color: #FFC107;
+        }
+
+        table.table td a.delete {
+            color: #E34724;
+        }
+
+        table.table td .add {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="p-5 bg-dark text-white text-center">
+        <span class="text-center">
+            <p class="h1">Bill Splitter</p>
+            <p>Split your bill, the free and smart way!</p>
+        </span>
+    </header>
+    <div class="container p-4 my-5 border bg-light">
+
+
+
+        <div class="table bg-white">
+            <div class="table-wrapper">
+                <div class="table-title">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <h2>Add <b>Expense</b></h2> for <span
+                                id="participants">Gaurab,Pushan,Faiz,Chandan,Awal</span>
+                        </div>
+                    </div>
+                </div>
+                <table id="expenseTable" class="table  table-hover table-bordered" style="text-overflow: ellipsis;">
+                    <colgroup>
+                        <col class="col-md-2">
+                        <col class="col-md-6">
+                        <col class="col-md-1">
+                        <col class="col-md-2">
+                        <col class="col-md-1">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Paid By</th>
+                            <th>Expenditure Summary</th>
+                            <th>Amount</th>
+                            <th>Shared By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr></tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-info btn-block add-new  w-100">
+                    <i class="fa fa-plus"></i> Add New
+                </button>
+            </div>
+        </div>
+
+
+
+
+        
+    </div>
+
+
+    
+    <footer class="bg-dark text-center text-white ">
+        <!-- Grid container -->
+        <div class="container p-4 pb-0">
+            <!-- Section: Social media -->
+            <section class="mb-4">
+                <!-- Facebook -->
+                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
+                    href="https://www.facebook.com/gaurabjha" role="button"><i class="fab fa-facebook-f"></i></a>
+
+                <!-- Twitter -->
+                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
+                    href="https://twitter.com/gaurab_j" role="button"><i class="fab fa-twitter"></i></a>
+
+                <!-- Google -->
+                <a class="btn btn-outline-light btn-floating m-1" href="mailto:gaurabkjha@gmail.com" role="button"><i
+                        class="fab fa-google"></i></a>
+
+                <!-- Instagram -->
+                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
+                    href="https://www.instagram.com/l0gan.pi" role="button"><i class="fab fa-instagram"></i></a>
+
+                <!-- Linkedin -->
+                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
+                    href="https://www.linkedin.com/in/gaurabjha/" role="button"><i class="fab fa-linkedin-in"></i></a>
+
+                <!-- Github -->
+                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
+                    href="https://github.com/gaurabjha" role="button"><i class="fab fa-github"></i></a>
+            </section>
+            <!-- Section: Social media -->
+        </div>
+        <!-- Grid container -->
+
+        <!-- Copyright -->
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2020 Copyright:
+            <a class="text-white" href="https://github.com/gaurabjha">Gaurab Jha</a>
+        </div>
+        <!-- Copyright -->
+    </footer>
+</body>
+
+</html>
