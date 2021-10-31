@@ -4,7 +4,7 @@ $(document).ready(function () {
 
 	$('body').on('click', '*', function () { $(this).tooltip('hide') });
 
-	var participants = $("#participants").html().split(',');
+	var participants = '' //$("#participants").html().split(',');
 
 	participantsOptionsSelected = ''
 	participantsOptions = ''
@@ -55,11 +55,17 @@ $(document).ready(function () {
 		$('#BillMetaCard button').attr("disabled", true);
 		$(this).attr("disabled", true);
 
+		participants = $("input[id='person']")
+			.map(function () { return $(this).val(); }).get();
+
+		$('#BillName').html($('#meta-bill-name').val())
+		$('#participants').html(participants.join())
+
 		participants.forEach(element => {
 			participantsOptionsSelected += '<option selected value="' + element + '">' + element + '</option>'
 			participantsOptions += '<option value="' + element + '">'
-
 		});
+
 		newColumn()
 	});
 });
