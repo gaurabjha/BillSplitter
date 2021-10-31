@@ -27,14 +27,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="resources/js/AddExpense.js"></script>
 
-    <!--Smart Wizard-->
-    <link href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/smart_wizard.min.css" rel="stylesheet"
-        type="text/css" />
-    <link href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/smart_wizard_theme_arrows.min.css"
-        rel="stylesheet" type="text/css" />
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/jquery.smartWizard.min.js"></script>
-
     <style>
         table.table th i {
             font-size: 13px;
@@ -69,45 +61,98 @@
         </span>
     </header>
     <div class="container p-4 my-5 border bg-light">
-        <div class="table bg-white">
-            <div class="table-wrapper">
-                <div class="table-title">
-                    <div class="row">
-                        <div class="col-sm-8">
-                            <h2>Add <b>Expense</b></h2> for <span
-                                id="participants">Gaurab,Pushan,Faiz,Chandan,Awal</span>
+        <!-- <div id="Bill">
+            <button type="button" class="btn btn-info btn-block add-new  w-100">
+                <i class="fa fa-plus"></i> Add New
+            </button>
+        </div> -->
+
+        <div id="accordion">
+
+            <div class="card" id="BillMetaCard">
+                <div class="card-header">
+                    <button class="btn  btn-block" data-bs-toggle="collapse" href="#BillMeta">Bill Details</button>
+                </div>
+                <div id="BillMeta" class="collapse show" data-bs-parent="#accordion">
+                    <div class="card-body">
+                        <div class="form-floating mb-3 mt-3">
+                            <input type="text" class="form-control" id="bill-name"
+                                placeholder="Enter a Name for the Bill" name="bill-name">
+                            <label for="bill-name">Bill Name:</label>
+                        </div>
+                        <div class="form-floating mb-3 mt-3">
+                            <input type="text" class="form-control" id="person1" placeholder="Enter name" name="person">
+                            <label for="person1">Person Name 1:</label>
+                        </div>
+                        <div class="form-floating mb-3 mt-3">
+                            <input type="text" class="form-control" id="person2" placeholder="Enter name" name="person">
+                            <label for="person2">Person Name 2:</label>
                         </div>
                     </div>
                 </div>
-                <table id="expenseTable" class="table  table-hover table-bordered" style="text-overflow: ellipsis;">
-                    <colgroup>
-                        <col class="col-md-2">
-                        <col class="col-md-6">
-                        <col class="col-md-1">
-                        <col class="col-md-2">
-                        <col class="col-md-1">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>Paid By</th>
-                            <th>Expenditure Summary</th>
-                            <th>Amount</th>
-                            <th>Shared By</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr></tr>
-                    </tbody>
-                </table>
-                <button type="button" class="btn btn-info btn-block add-new  w-100">
-                    <i class="fa fa-plus"></i> Add New
-                </button>
             </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <button role="button" class="collapsed btn btn-block" id="AddExpenseAccordianButton" data-bs-toggle="collapse" href="#ExpenseCard">
+                        Add Expense
+                    </button>
+                </div>
+                <div id="ExpenseCard" class="collapse" data-bs-parent="#accordion">
+                    <div class="card-body">
+
+                        <div id="expendeEditor">
+                            <div class="table bg-white">
+                                <div class="table-wrapper">
+                                    <div class="table-title">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <h2>Add <b>Expense</b></h2> for <span
+                                                    id="participants">Gaurab,Pushan,Faiz,Chandan,Awal</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form action="" id="commentForm">
+                                        <fieldset>
+                                            <table id="expenseTable" class="table  table-hover table-bordered"
+                                                style="text-overflow: ellipsis;">
+                                                <colgroup>
+                                                    <col class="col-md-2">
+                                                    <col class="col-md-6">
+                                                    <col class="col-md-1">
+                                                    <col class="col-md-2">
+                                                    <col class="col-md-1">
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Paid By</th>
+                                                        <th>Expenditure Summary</th>
+                                                        <th>Amount</th>
+                                                        <th>Shared By</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr></tr>
+                                                </tbody>
+                                            </table>
+                                            <button type="button" class="btn btn-info btn-block add-new  w-100">
+                                                <i class="fa fa-plus"></i> Add New
+                                            </button>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
     </div>
 
-    
+
     <footer class="bg-dark text-center text-white ">
         <!-- Grid container -->
         <div class="container p-4 pb-0">
