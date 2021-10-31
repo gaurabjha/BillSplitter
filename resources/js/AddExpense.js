@@ -1,4 +1,6 @@
+alert("Script Loaded")
 $(document).ready(function(){
+	alert("Ready Jquery Called")
 	$('[data-toggle="tooltip"]').tooltip();
 
 	$('body').on('click', '*', function () { $(this).tooltip('hide') });
