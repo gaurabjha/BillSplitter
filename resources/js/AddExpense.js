@@ -19,7 +19,6 @@ $(document).ready(function () {
 		'				</a>													' +
 		'			</td>                                                 		';
 
-
 	// Append table with add row form on add new button click
 
 	function newColumn() {
@@ -29,7 +28,7 @@ $(document).ready(function () {
 			'<td><input type="text" class="form-control" id="summary" /></td>' +
 			'<td><input type="number" class="form-control" id="amount" /></td>' +
 			'<td> ' +
-			'   <div><select id="choices-multiple-remove-button" multiple id="paidFor">' +
+			'   <div><select id="choices-multiple-remove-button" class="paidFor" multiple >' +
 			participantsOptionsSelected +
 			'	</select></div>' +
 			'</td>' +
@@ -74,28 +73,6 @@ $(document).ready(function () {
 	});
 
 
-	function createGraph(){
-
-
-		/*
-		'<td><select class="form-select" id="sel1" name="payee">' + participantsOptions + '</select></td>' +
-			'<td><input type="text" class="form-control" name="summary" /></td>' +
-			'<td><input type="number" class="form-control" name="amount" /></td>' +
-			'<td> ' +
-			'   <div><select id="choices-multiple-remove-button" multiple name="paidFor">' +
-			participantsOptionsSelected +
-			'	</select></div>' +
-			'</td>' +
-		*/
-		$('#expenseTable > tbody  > tr').each(function(index, tr) { 
-			console.log(index);
-			console.log($(tr).find('#payee').val());
-			// $(element).find('.name').text()
-		 });
-		// var expenseRows = $("#expenseTable tbody tr").forEach(element => {
-		// 	console.log($(element).html());
-		// });
-	}
 
 	$("#ExpenseReportButton").click(function () {
 
@@ -103,20 +80,40 @@ $(document).ready(function () {
 		$("#ExpenseReportCardBody").html("")
 		$("#ExpenseReportCardBody").slideDown(1000, function () {
 
-			let graph = Array(participants.length).fill().map(() => Array(participants.length).fill(Math.floor((Math.random() * 10) + 1)));
-			alert(graph)
-			createGraph();
-		// 	var graph = [[0, 1000, 2000, 500, 0],
-		// 	[0, 0, 5000, 200, 1000],
-		// 	[0, 0, 0, 0, 5000],
-		// 	[0, 0, 0, 0, 5000],
-		// 	[0, 0, 0, 0, 5000]		
-		// ];
-			
+
+			var graph = Array(participants.length).fill().map(() => Array(participants.length).fill(0));
+
+			$('#expenseTable > tbody  > tr').each(function (index, tr) {
+				// console.log(index);
+				// console.log($(tr).find('#payee').val());
+
+				var payee = $(tr).find('#payee').val();
+
+				var amount = $(tr).find('#amount').val();
+
+				var values = $(".paidFor :selected").map((_, e) => e.value).get();
+
+				values.forEach(element => {
+					console.log(element + " owes Rs " + amount + " to " + payee);
+					graph[participants.indexOf(element)][participants.indexOf(payee)] += (parseFloat(amount) / values.length);
+				});
+			});
 
 			// Print the solution
 			// alert("Bill Object created");
+			// alert(graph)
+			var share = new Map()
 
+			participants.forEach(receiver => {
+				var myShare = 0.0;
+				participants.forEach(payer => {
+					myShare += graph[participants.indexOf(receiver)][participants.indexOf(payer)];
+				});
+				share.set(receiver, myShare);
+			});
+			share.forEach(function (value, key) {
+				alert(key + ' Expenditure is Rs : ' + value);
+			})
 			calculate(graph, participants)
 		});
 	});

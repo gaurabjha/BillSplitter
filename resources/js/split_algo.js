@@ -63,7 +63,7 @@ function minCashFlowRec(amount) {
     // alert("<br>" + nameArray[mxDebit] + " pays " + min
     //     + " to " + "Person " + nameArray[mxCredit])
 
-    $("#ExpenseReportCardBody").append("<br>" + nameArray[mxDebit] + " pays " + min
+    $("#ExpenseReportCardBody").append("<br>" + Math.round(nameArray[mxDebit]) + " pays " + min
     + " to " + "Person " + nameArray[mxCredit])
 
     // Recur for the amount array.
