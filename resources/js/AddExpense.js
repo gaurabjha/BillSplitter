@@ -112,7 +112,7 @@ $(document).ready(function () {
 				share.set(receiver, myShare);
 			});
 			share.forEach(function (value, key) {
-				alert(key + ' Expenditure is Rs : ' + value);
+				console.log(key + ' Expenditure is Rs : ' + value);
 			})
 			calculate(graph, participants)
 		});

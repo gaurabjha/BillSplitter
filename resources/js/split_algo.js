@@ -97,7 +97,7 @@ function calculate(graph, names) {
         for (i = 0; i < N; i++)
             amount[p] += (graph[i][p] - graph[p][i]);
 
-    alert(amount);
+    console.log(amount);
     minCashFlowRec(amount);
 }
 
