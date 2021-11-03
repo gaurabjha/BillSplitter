@@ -6,6 +6,30 @@ $(document).ready(function () {
 
 	$('body').on('click', '*', function () { $(this).tooltip('hide') });
 
+	$('#members').select2({
+		placeholder: "Enter Members for the Bill",
+		tags: true,
+		allowClear: true,
+		minimumResultsForSearch: -1,
+	});
+	// $('#members').on('select2:open', function () {
+	// 	alert("opened")
+	// 	// get values of selected option
+	// 	var values = $(this).val();
+	// 	// get the pop up selection
+	// 	var pop_up_selection = $('.select2-results__options');
+	
+	// 	if (values != null ) {
+	// 	  // hide the selected values
+	// 	   pop_up_selection.find("li[aria-selected=true]").hide();
+	
+	// 	} else {
+	// 	  // show all the selection values
+	// 	  pop_up_selection.find("li[aria-selected=true]").show();
+	// 	}
+	
+	//   });
+
 	var participants = []; //$("#participants").html().split(',');
 
 	participantsOptionsSelected = ''
@@ -21,6 +45,7 @@ $(document).ready(function () {
 
 	// Append table with add row form on add new button click
 
+
 	function newColumn() {
 		var index = $("#expenseTable tbody tr:last-child").index();
 		var row = '<tr>' +
@@ -28,17 +53,22 @@ $(document).ready(function () {
 			'<td><input type="text" class="form-control" id="summary" /></td>' +
 			'<td><input type="number" class="form-control" id="amount" /></td>' +
 			'<td> ' +
-			'   <div><select id="choices-multiple-remove-button" class="paidFor" multiple >' +
-			participantsOptionsSelected +
-			'	</select></div>' +
+			'   <div> ' +
+			'		<select id="js-example-basic-hide-search-multi" class="paidFor" multiple style="width: 100%">' + participantsOptionsSelected + '</select>' +
+			'	</div>' +
 			'</td>' +
-			actions +
+				actions +
 			'</tr>';
 		$("#expenseTable").append(row);
 		$('[data-toggle="tooltip"]').tooltip();
-		var multipleCancelButton = new Choices('#expenseTable tbody tr:last-child #choices-multiple-remove-button', {
-			removeItemButton: true
+		$('#expenseTable tbody tr:last-child #js-example-basic-hide-search-multi').select2();
+		$('#expenseTable tbody tr:last-child #js-example-basic-hide-search-multi').on('select2:opening select2:closing', function (event) {
+			var $searchfield = $(this).parent().find('.select2-search__field');
+			$searchfield.prop('disabled', true);
 		});
+		// var multipleCancelButton = new Choices('#expenseTable tbody tr:last-child #choices-multiple-remove-button', {
+		// 	removeItemButton: true
+		// });
 	}
 
 	// newColumn();
@@ -49,13 +79,15 @@ $(document).ready(function () {
 
 	$(document).on("click", ".delete", function () {
 		$(this).parents("tr").remove();
-	});
+	});;
 
 	$("#AddExpenseButton").click(function () {
 
 		//Create the Participants Options
-		participants = $("input[id='person']")
-			.map(function () { return $(this).val(); }).get();
+		participants = $("#members :selected").map((_, e) => e.value).get();
+
+		//$("input[id='person']")
+		//	.map(function () { return $(this).val(); }).get();
 
 		$('#BillName').html($('#meta-bill-name').val() + '<b> Expense</b>')
 		$('#participants').html('for ' + participants.join())
