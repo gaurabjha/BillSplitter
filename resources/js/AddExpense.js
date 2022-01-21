@@ -66,9 +66,6 @@ $(document).ready(function () {
 			var $searchfield = $(this).parent().find('.select2-search__field');
 			$searchfield.prop('disabled', true);
 		});
-		// var multipleCancelButton = new Choices('#expenseTable tbody tr:last-child #choices-multiple-remove-button', {
-		// 	removeItemButton: true
-		// });
 	}
 
 	// newColumn();
@@ -123,11 +120,11 @@ $(document).ready(function () {
 
 				var amount = $(tr).find('#amount').val();
 
-				var values = $(".paidFor :selected").map((_, e) => e.value).get();
+				var paidFor = $(".paidFor :selected").map((_, e) => e.value).get();
 
-				values.forEach(element => {
-					console.log(element + " owes Rs " + amount + " to " + payee);
-					graph[participants.indexOf(element)][participants.indexOf(payee)] += (parseFloat(amount) / values.length);
+				paidFor.forEach(element => {
+					console.log(element + " owes Rs " + (parseFloat(amount) / paidFor.length) + " to " + payee);
+					graph[participants.indexOf(element)][participants.indexOf(payee)] += (parseFloat(amount) / paidFor.length);
 				});
 			});
 
