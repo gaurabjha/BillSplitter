@@ -1,149 +1,286 @@
-// import SplitBill from './split_algo.js'; 
+// AddExpense.js
+// Requires: jQuery, Select2, split_algo.js
 
 $(document).ready(function () {
-	$('[data-toggle="tooltip"]').tooltip();
-	$("#ExpenditureBody, #ExpenseReportCardBody, #ExpenseReportCard").hide();
 
-	$('body').on('click', '*', function () { $(this).tooltip('hide') });
+    // ── State ─────────────────────────────────────────────────────────────
+    var participants = [];
+    var participantsOptionsSelected = '';
+    var participantsOptions = '';
 
-	$('#members').select2({
-		placeholder: "Enter Members for the Bill",
-		tags: true,
-		allowClear: true,
-		minimumResultsForSearch: -1,
-	});
-	// $('#members').on('select2:open', function () {
-	// 	alert("opened")
-	// 	// get values of selected option
-	// 	var values = $(this).val();
-	// 	// get the pop up selection
-	// 	var pop_up_selection = $('.select2-results__options');
-	
-	// 	if (values != null ) {
-	// 	  // hide the selected values
-	// 	   pop_up_selection.find("li[aria-selected=true]").hide();
-	
-	// 	} else {
-	// 	  // show all the selection values
-	// 	  pop_up_selection.find("li[aria-selected=true]").show();
-	// 	}
-	
-	//   });
+    // ── Helpers ───────────────────────────────────────────────────────────
+    var avatarColors = ['av-0', 'av-1', 'av-2', 'av-3', 'av-4'];
 
-	var participants = []; //$("#participants").html().split(',');
+    function avatarClass(name) {
+        var idx = 0;
+        for (var i = 0; i < name.length; i++) {
+            idx += name.charCodeAt(i);
+        }
+        return avatarColors[idx % avatarColors.length];
+    }
 
-	participantsOptionsSelected = ''
-	participantsOptions = ''
+    function initials(name) {
+        var parts = name.trim().split(' ');
+        var result = '';
+        for (var i = 0; i < Math.min(parts.length, 2); i++) {
+            if (parts[i].length > 0) result += parts[i][0].toUpperCase();
+        }
+        return result;
+    }
 
-	//alert(participants)
-	// create the expense table action column
-	var actions = '<td id="action" class="w-10">                          		' +
-		'				<a class="delete justify-content-center" title="Delete" data-toggle="tooltip">	' +
-		'					<i class="fas fa-trash-alt"></i>				' +
-		'				</a>													' +
-		'			</td>                                                 		';
+    function formatRs(n) {
+        var num = parseFloat(n) || 0;
+        return '\u20B9' + num.toLocaleString('en-IN', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
 
-	// Append table with add row form on add new button click
+    // ── Select2: Members input ─────────────────────────────────────────────
+    $('#members').select2({
+        placeholder: 'Type a name and press Enter\u2026',
+        tags: true,
+        allowClear: true,
+        minimumResultsForSearch: -1,
+        dropdownParent: $('body')
+    });
 
+    // ── Build a new expense row ────────────────────────────────────────────
+    function newColumn() {
+        var row = '<tr>' +
+            '<td>' +
+                '<select class="payee" style="width:100%">' + participantsOptions + '</select>' +
+            '</td>' +
+            '<td>' +
+                '<input type="text" class="bs-input summary-input" placeholder="e.g. Dinner, Cab\u2026" />' +
+            '</td>' +
+            '<td>' +
+                '<input type="number" class="bs-input amount-input" placeholder="0" min="0" step="0.01" />' +
+            '</td>' +
+            '<td>' +
+                '<select class="paidFor" multiple style="width:100%">' + participantsOptionsSelected + '</select>' +
+            '</td>' +
+            '<td style="text-align:center">' +
+                '<button type="button" class="delete-btn delete" title="Delete row"><i class="fas fa-trash-alt"></i></button>' +
+            '</td>' +
+        '</tr>';
 
-	function newColumn() {
-		var index = $("#expenseTable tbody tr:last-child").index();
-		var row = '<tr>' +
-			'<td><select class="form-select" id="payee">' + participantsOptions + '</select></td>' +
-			'<td><input type="text" class="form-control" id="summary" /></td>' +
-			'<td><input type="number" class="form-control" id="amount" /></td>' +
-			'<td> ' +
-			'   <div> ' +
-			'		<select id="js-example-basic-hide-search-multi" class="paidFor" multiple style="width: 100%">' + participantsOptionsSelected + '</select>' +
-			'	</div>' +
-			'</td>' +
-				actions +
-			'</tr>';
-		$("#expenseTable").append(row);
-		$('[data-toggle="tooltip"]').tooltip();
-		$('#expenseTable tbody tr:last-child #js-example-basic-hide-search-multi').select2();
-		$('#expenseTable tbody tr:last-child #js-example-basic-hide-search-multi').on('select2:opening select2:closing', function (event) {
-			var $searchfield = $(this).parent().find('.select2-search__field');
-			$searchfield.prop('disabled', true);
-		});
-	}
+        $('#expenseTable tbody').append(row);
 
-	// newColumn();
+        var $lastRow = $('#expenseTable tbody tr:last-child');
 
-	$(".add-new").click(function () {
-		newColumn();
-	});
+        $lastRow.find('.payee').select2({
+            minimumResultsForSearch: -1,
+            dropdownParent: $('body')
+        });
 
-	$(document).on("click", ".delete", function () {
-		$(this).parents("tr").remove();
-	});;
+        $lastRow.find('.paidFor').select2({
+            dropdownParent: $('body')
+        });
 
-	$("#AddExpenseButton").click(function () {
+        $lastRow.find('.paidFor').on('select2:opening select2:closing', function () {
+            $(this).parent().find('.select2-search__field').prop('disabled', true);
+        });
 
-		//Create the Participants Options
-		participants = $("#members :selected").map((_, e) => e.value).get();
+        updateSummaryBar();
+    }
 
-		//$("input[id='person']")
-		//	.map(function () { return $(this).val(); }).get();
+    // ── Delete row ────────────────────────────────────────────────────────
+    $(document).on('click', '.delete', function () {
+        $(this).closest('tr').remove();
+        updateSummaryBar();
+    });
 
-		$('#BillName').html($('#meta-bill-name').val() + '<b> Expense</b>')
-		$('#participants').html('for ' + participants.join())
+    // ── Live summary bar ──────────────────────────────────────────────────
+    $(document).on('change keyup', '.amount-input', function () {
+        updateSummaryBar();
+    });
 
-		participants.forEach(element => {
-			participantsOptionsSelected += '<option selected value="' + element + '">' + element + '</option>'
-			participantsOptions += '<option value="' + element + '">' + element + '</option>'
-		});
+    function updateSummaryBar() {
+        if (participants.length === 0) return;
 
-		//remove the Bill Meta data section and show the Add Expense Section
-		$("#BillMetaCard").slideUp(1000);
-		$("#ExpenditureBody, #ExpenseReportCard").slideDown(1000);
-		$('#AddExpenseButton').remove()
-		newColumn()
-	});
+        var totals = {};
+        for (var k = 0; k < participants.length; k++) {
+            totals[participants[k]] = 0;
+        }
 
+        $('#expenseTable tbody tr').each(function () {
+            var payee  = $(this).find('.payee').val();
+            var amount = parseFloat($(this).find('.amount-input').val()) || 0;
+            if (payee && totals[payee] !== undefined) {
+                totals[payee] += amount;
+            }
+        });
 
+        var grand = 0;
+        for (var p in totals) {
+            grand += totals[p];
+        }
 
-	$("#ExpenseReportButton").click(function () {
+        if (grand === 0) {
+            $('#summaryBar').addClass('hidden');
+            return;
+        }
 
-		//Create the Participants Options
-		$("#ExpenseReportCardBody").html("")
-		$("#ExpenseReportCardBody").slideDown(1000, function () {
+        var html = '';
+        for (var i = 0; i < participants.length; i++) {
+            var p = participants[i];
+            if (totals[p] > 0) {
+                html += '<span class="summary-chip">' +
+                    '<span class="chip-name">' + p + '</span>' +
+                    ' paid <span class="chip-amount">' + formatRs(totals[p]) + '</span>' +
+                '</span>';
+            }
+        }
+        html += '<span class="summary-chip" style="margin-left:auto;">' +
+            'Total <span class="chip-amount">' + formatRs(grand) + '</span>' +
+        '</span>';
 
+        $('#summaryBar').html(html).removeClass('hidden');
+    }
 
-			var graph = Array(participants.length).fill().map(() => Array(participants.length).fill(0));
+    // ── "Continue to Add Expenses" button ────────────────────────────────
+    $('#AddExpenseButton').click(function () {
+        var billName = $('#meta-bill-name').val().trim();
+        participants = $('#members :selected').map(function (_, e) { return e.value; }).get();
 
-			$('#expenseTable > tbody  > tr').each(function (index, tr) {
-				// console.log(index);
-				// console.log($(tr).find('#payee').val());
+        if (!billName) {
+            $('#meta-bill-name').css('border-color', 'var(--red)').focus();
+            setTimeout(function () { $('#meta-bill-name').css('border-color', ''); }, 1500);
+            return;
+        }
+        if (participants.length < 2) {
+            alert('Please add at least 2 members to split the bill.');
+            return;
+        }
 
-				var payee = $(tr).find('#payee').val();
+        // Advance step indicators
+        $('#step1').removeClass('active').addClass('done');
+        $('#step1 .step-num').html('<i class="fas fa-check" style="font-size:10px"></i>');
+        $('#step2').addClass('active');
 
-				var amount = $(tr).find('#amount').val();
+        participantsOptionsSelected = '';
+        participantsOptions = '';
+        for (var i = 0; i < participants.length; i++) {
+            var el = participants[i];
+            participantsOptionsSelected += '<option selected value="' + el + '">' + el + '</option>';
+            participantsOptions         += '<option value="' + el + '">' + el + '</option>';
+        }
 
-				var paidFor = $(tr).find('.paidFor :selected').map((_, e) => e.value).get();
+        $('#BillName').html(billName);
+        $('#participants').html(participants.join(' \u00B7 '));
 
-				paidFor.forEach(element => {
-					console.log(element + " owes Rs " + (parseFloat(amount) / paidFor.length) + " to " + payee);
-					graph[participants.indexOf(element)][participants.indexOf(payee)] += (parseFloat(amount) / paidFor.length);
-				});
-			});
+        $('#BillMetaCard').slideUp(600);
+        $('#ExpenditureCard').removeClass('hidden').hide().slideDown(600);
+        $('#AddExpenseButton').remove();
+        newColumn();
+    });
 
-			// Print the solution
-			// alert("Bill Object created");
-			// alert(graph)
-			var share = new Map()
+    // ── Add new expense row ───────────────────────────────────────────────
+    $(document).on('click', '.add-new', function () {
+        newColumn();
+    });
 
-			participants.forEach(receiver => {
-				var myShare = 0.0;
-				participants.forEach(payer => {
-					myShare += graph[participants.indexOf(receiver)][participants.indexOf(payer)];
-				});
-				share.set(receiver, myShare);
-			});
-			share.forEach(function (value, key) {
-				console.log(key + ' Expenditure is Rs : ' + value);
-			})
-			calculate(graph, participants)
-		});
-	});
+    // ── Reset / Start Over ────────────────────────────────────────────────
+    $('#resetBtn').click(function () {
+        if (confirm('Start over? All expenses will be cleared.')) {
+            location.reload();
+        }
+    });
+
+    // ── Calculate Settlement ──────────────────────────────────────────────
+    $('#ExpenseReportButton').click(function () {
+
+        // Advance steps
+        $('#step2').removeClass('active').addClass('done');
+        $('#step2 .step-num').html('<i class="fas fa-check" style="font-size:10px"></i>');
+        $('#step3').addClass('active');
+
+        // Build adjacency matrix
+        var graph = [];
+        for (var a = 0; a < participants.length; a++) {
+            graph[a] = [];
+            for (var b = 0; b < participants.length; b++) {
+                graph[a][b] = 0;
+            }
+        }
+
+        // Track how much each person actually spent (paid)
+        var spent = {};
+        for (var s = 0; s < participants.length; s++) {
+            spent[participants[s]] = 0;
+        }
+
+        $('#expenseTable tbody tr').each(function () {
+            var $row   = $(this);
+            var payee  = $row.find('.payee').val();
+            var amount = parseFloat($row.find('.amount-input').val()) || 0;
+            // FIX: scope paidFor to this row only (was a global selector before)
+            var paidFor = $row.find('.paidFor :selected').map(function (_, e) { return e.value; }).get();
+
+            if (!payee || amount <= 0 || paidFor.length === 0) return;
+
+            if (spent[payee] !== undefined) spent[payee] += amount;
+
+            var share = amount / paidFor.length;
+            for (var i = 0; i < paidFor.length; i++) {
+                var person  = paidFor[i];
+                var fromIdx = participants.indexOf(person);
+                var toIdx   = participants.indexOf(payee);
+                if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+                    graph[fromIdx][toIdx] += share;
+                }
+            }
+        });
+
+        // Run algorithm — returns array of { from, to, amount }
+        var results = calculate(graph, participants);
+
+        // ── Build report HTML ──────────────────────────────────────────
+        var html = '';
+
+        // Per-person totals
+        html += '<div class="section-label">Total Paid Per Person</div>';
+        html += '<div class="totals-grid">';
+        for (var t = 0; t < participants.length; t++) {
+            var p = participants[t];
+            html += '<div class="total-card">' +
+                '<div class="tc-name">' + p + '</div>' +
+                '<div class="tc-amount">' + formatRs(spent[p] || 0) + '</div>' +
+            '</div>';
+        }
+        html += '</div>';
+
+        // Settlement transactions
+        html += '<div class="section-label" style="margin-top:20px">Who Pays Whom</div>';
+
+        if (results.length === 0) {
+            html += '<div class="no-debts">' +
+                '<i class="fas fa-check-circle"></i>' +
+                '<div style="font-size:1rem;color:var(--green);font-weight:600;">All settled!</div>' +
+                '<div style="margin-top:4px;font-size:0.85rem;">Everyone\'s contributions are already balanced.</div>' +
+            '</div>';
+        } else {
+            html += '<div class="settlement-list">';
+            for (var r = 0; r < results.length; r++) {
+                var s = results[r];
+                var avFrom = avatarClass(s.from);
+                var avTo   = avatarClass(s.to);
+                var delay  = (r * 0.07) + 's';
+                html += '<div class="settlement-item" style="animation-delay:' + delay + '">' +
+                    '<div class="settlement-avatar ' + avFrom + '">' + initials(s.from) + '</div>' +
+                    '<div class="settlement-text"><span>' + s.from + '</span> pays <span>' + s.to + '</span></div>' +
+                    '<div class="settlement-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>' +
+                    '<div class="settlement-avatar ' + avTo + '">' + initials(s.to) + '</div>' +
+                    '<div class="settlement-amount">' + formatRs(s.amount) + '</div>' +
+                '</div>';
+            }
+            html += '</div>';
+        }
+
+        $('#ExpenseReportCardBody').html(html);
+        $('#ExpenseReportCard').removeClass('hidden').hide().slideDown(600);
+        $('html, body').animate({ scrollTop: $('#ExpenseReportCard').offset().top - 20 }, 600);
+    });
+
 });
