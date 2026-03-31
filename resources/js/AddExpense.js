@@ -120,7 +120,7 @@ $(document).ready(function () {
 
 				var amount = $(tr).find('#amount').val();
 
-				var paidFor = $(".paidFor :selected").map((_, e) => e.value).get();
+				var paidFor = $(tr).find('.paidFor :selected').map((_, e) => e.value).get();
 
 				paidFor.forEach(element => {
 					console.log(element + " owes Rs " + (parseFloat(amount) / paidFor.length) + " to " + payee);
