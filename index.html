@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>BillSpliter</title>
+    <title>Bill Splitter - Smart Bill Division</title>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
 
@@ -14,80 +14,425 @@
 
     <!-- Fonts and Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
-        integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
-        crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa3IW2lEnf3lGY6i7IYrQLmuP+W+P6+rKDxK7ZCVV2sgQQ7qxnGzhVQnZmgsAZS19NJgeOr7nl+a4fPcLg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="resources/js/split_algo.js"></script>
     <script src="resources/js/AddExpense.js"></script>
 
-    <!-- Drop Box -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
-    <script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script> -->
+    <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-
-
     <style>
-        html,
-        body {
-            min-width: 720px;
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #ec4899;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
         }
 
-        table.table th i {
-            font-size: 13px;
-            margin: 0 5px;
+        * {
+            transition: all 0.3s ease;
+        }
+
+        html,
+        body {
+            min-width: 320px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styling */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 2.5rem 1rem !important;
+        }
+
+        header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        /* Main Container */
+        .container {
+            padding: 2rem 1rem !important;
+            margin: 2rem auto !important;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            max-width: 900px;
+            flex: 1;
+        }
+
+        /* Card Styling */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            border: none;
+            padding: 1.5rem !important;
+            font-weight: 600;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem !important;
+        }
+
+        /* Form Controls */
+        .form-control,
+        .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            border-radius: 8px;
+        }
+
+        /* Button Styling */
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
             cursor: pointer;
         }
 
-        table.table td a.delete {
-            color: #E34724;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
         }
 
-        #select2-js-example-basic-hide-search-multi-results .select2-results__option[aria-selected=true] {
-            display: none;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            color: white;
         }
 
-        li {
-            width: 100%;
+        .btn-info {
+            background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Table Styling */
+        .table {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            border: none;
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+
+        .table tbody tr:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .table tbody td {
+            border: none;
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table td a.delete {
+            color: var(--danger-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .table td a.delete:hover {
+            color: #991b1b;
+            transform: scale(1.2);
+        }
+
+        /* Select2 Customization */
+        .select2-container--default .select2-selection--multiple {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .select2-container--default .select2-selection--multiple:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Expense Report Styling */
+        .expense-report-item {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .expense-report-item strong {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .expense-summary {
+            background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .expense-summary h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Alert Styling */
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        /* Badge Styling */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .badge-primary {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            margin-top: auto;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-floating {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-floating:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 1rem !important;
+                margin: 1rem auto !important;
+            }
+
+            .card-body {
+                padding: 1rem !important;
+            }
+
+            .table {
+                font-size: 0.9rem;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 0.75rem;
+            }
+
+            #card_container {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Tooltip Styling */
+        .tooltip-inner {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 
 <body>
     <header class="p-5 bg-dark text-white text-center">
-        <span class="text-center">
-            <p class="h1">Bill Splitter</p>
-            <p>Split your bill, the free and smart way!</p>
-        </span>
+        <div class="text-center">
+            <h1><i class="fas fa-receipt me-2"></i>Bill Splitter</h1>
+            <p class="mb-0" style="font-size: 1.1rem;">Split your bill, the free and smart way!</p>
+        </div>
     </header>
-    <div class="container p-4 my-5 border bg-light">
-        <!-- <div id="Bill">
-            <button type="button" class="btn btn-info btn-block add-new  w-100">
-                <i class="fa fa-plus"></i> Add New
-            </button>
-        </div> -->
-
+    <div class="container">
+        <!-- Bill Meta Data Card -->
         <div id="card_container">
-            <!-- Bill Meta Data Card -->
             <div class="card" id="BillMetaCard">
-                <div class="card-header bg-primary">
-                    <div class="w-100 text-left text-white">Bill Details</div>
+                <div class="card-header">
+                    <h2 class="mb-0"><i class="fas fa-info-circle me-2"></i>Bill Details</h2>
                 </div>
                 <div id="BillMeta">
                     <div class="card-body">
-                        <div class="form-floating mb-3 mt-3">
+                        <div class="form-floating mb-4 mt-2">
                             <input type="text" class="form-control" id="meta-bill-name"
                                 placeholder="Enter a Name for the Bill" name="bill-name" required>
-                            <label for="bill-name">Bill Name:</label>
+                            <label for="meta-bill-name"><i class="fas fa-tag me-2"></i>Bill Name</label>
                         </div>
-                        <div class="form-floating mb-3 mt-3">
-                            <select class="form-control " name="person" id="members" multiple="multiple">
+                        <div class="form-floating mb-4">
+                            <select class="form-control" name="person" id="members" multiple="multiple">
                             </select>
+                            <label for="members"><i class="fas fa-users me-2"></i>Add Members</label>
                         </div>
+                        <button type="button" class="btn btn-primary w-100" id="AddExpenseButton">
+                            <i class="fas fa-arrow-right me-2"></i>Continue to Add Expenses
+                        </button>
                     </div>
                 </div>
             </div>
@@ -95,51 +440,39 @@
 
         <!-- Add Expense Card -->
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <div class="col-sm-8">
-                    <h2>
-                        <span id="BillName"></span>
-                    </h2>
-                    <span id="participants"></span>
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8 col-12">
+                        <h2 class="mb-2"><i class="fas fa-plus-circle me-2"></i><span id="BillName"></span></h2>
+                        <p class="mb-0 text-white-50"><span id="participants"></span></p>
+                    </div>
                 </div>
-                <button class="btn btn-default w-100 text-left text-white" id="AddExpenseButton">
-                    Add Expense
-                </button>
             </div>
             <div class="card-body" id="ExpenditureBody">
                 <div id="expendeEditor">
-                    <div class="table-responsive-xxl bg-white">
+                    <div class="table-responsive">
                         <div class="table-wrapper">
                             <form action="" id="commentForm">
                                 <fieldset>
-                                    <table id="expenseTable" class="table table-hover table-bordered"
-                                        style="text-overflow: ellipsis;">
-                                        <colgroup>
-                                            <col class="col-md-2">
-                                            <col class="col-md-6">
-                                            <col class="col-md-1">
-                                            <col class="col-md-2">
-                                            <col class="col-md-1">
-                                        </colgroup>
+                                    <table id="expenseTable" class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th>Paid By</th>
-                                                <th>Expenditure Summary</th>
-                                                <th>Amount</th>
-                                                <th>Shared By</th>
-                                                <th>Action</th>
+                                                <th><i class="fas fa-user-circle me-1"></i>Paid By</th>
+                                                <th><i class="fas fa-comment me-1"></i>Description</th>
+                                                <th><i class="fas fa-rupee-sign me-1"></i>Amount</th>
+                                                <th><i class="fas fa-share-alt me-1"></i>Shared By</th>
+                                                <th><i class="fas fa-trash me-1"></i>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                         </tbody>
                                     </table>
-
                                 </fieldset>
                             </form>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-info btn-block add-new  w-100">
-                        <i class="fa fa-plus"></i> Add New
+                    <button type="button" class="btn btn-info w-100 add-new">
+                        <i class="fas fa-plus me-2"></i>Add New Expense
                     </button>
                 </div>
             </div>
@@ -147,59 +480,55 @@
 
         <!-- Expense Report Card -->
         <div class="card" id="ExpenseReportCard">
-            <div class="card-header bg-primary">
-                <div class="w-100 text-left text-white">
-                    <button class="btn btn-default w-100 text-left text-white" id="ExpenseReportButton">
-                        Expense Report
-                    </button>
-                </div>
+            <div class="card-header">
+                <button class="btn btn-light w-100 text-start" id="ExpenseReportButton">
+                    <i class="fas fa-chart-bar me-2"></i>View Expense Report
+                </button>
             </div>
             <div class="card-body" id="ExpenseReportCardBody">
             </div>
         </div>
-
-
-    </div>
     </div>
 
 
-    <footer class="bg-dark text-center text-white ">
+    <footer class="bg-dark text-center text-white mt-5">
         <!-- Grid container -->
         <div class="container p-4 pb-0">
             <!-- Section: Social media -->
             <section class="mb-4">
+                <p class="mb-3" style="font-weight: 500;">Connect with me</p>
                 <!-- Facebook -->
-                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
-                    href="https://www.facebook.com/gaurabjha" role="button"><i class="fab fa-facebook-f"></i></a>
+                <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
+                    href="https://www.facebook.com/gaurabjha" role="button" title="Facebook"><i class="fab fa-facebook-f"></i></a>
 
                 <!-- Twitter -->
-                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
-                    href="https://twitter.com/gaurab_j" role="button"><i class="fab fa-twitter"></i></a>
+                <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
+                    href="https://twitter.com/gaurab_j" role="button" title="Twitter"><i class="fab fa-twitter"></i></a>
 
                 <!-- Google -->
-                <a class="btn btn-outline-light btn-floating m-1" href="mailto:gaurabkjha@gmail.com" role="button"><i
+                <a class="btn btn-floating" href="mailto:gaurabkjha@gmail.com" role="button" title="Email"><i
                         class="fab fa-google"></i></a>
 
                 <!-- Instagram -->
-                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
-                    href="https://www.instagram.com/l0gan.pi" role="button"><i class="fab fa-instagram"></i></a>
+                <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
+                    href="https://www.instagram.com/l0gan.pi" role="button" title="Instagram"><i class="fab fa-instagram"></i></a>
 
                 <!-- Linkedin -->
-                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
-                    href="https://www.linkedin.com/in/gaurabjha/" role="button"><i class="fab fa-linkedin-in"></i></a>
+                <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
+                    href="https://www.linkedin.com/in/gaurabjha/" role="button" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
 
                 <!-- Github -->
-                <a class="btn btn-outline-light btn-floating m-1" target="_blank" rel="noopener noreferrer"
-                    href="https://github.com/gaurabjha" role="button"><i class="fab fa-github"></i></a>
+                <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
+                    href="https://github.com/gaurabjha" role="button" title="GitHub"><i class="fab fa-github"></i></a>
             </section>
             <!-- Section: Social media -->
         </div>
         <!-- Grid container -->
 
         <!-- Copyright -->
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-            © 2020 Copyright:
-            <a class="text-white" href="https://github.com/gaurabjha">Gaurab Jha</a>
+        <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.3);">
+            © 2026 Bill Splitter |
+            <a class="text-white" href="https://github.com/gaurabjha">Made by Gaurab Jha</a>
         </div>
         <!-- Copyright -->
     </footer>
