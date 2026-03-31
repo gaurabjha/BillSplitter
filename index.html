@@ -52,37 +52,44 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
         }
 
         /* Header Styling */
         header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 2.5rem 1rem !important;
+            padding: 1.5rem 1rem !important;
+            margin: 0;
+            width: 100%;
         }
 
         header h1 {
             font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.2rem;
+            margin-bottom: 0.3rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         header p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 300;
             opacity: 0.95;
+            margin: 0;
         }
 
         /* Main Container */
         .container {
-            padding: 2rem 1rem !important;
-            margin: 2rem auto !important;
+            padding: 1.5rem 1rem !important;
+            margin: 1.5rem auto !important;
             background: white;
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-            max-width: 900px;
-            flex: 1;
+            width: 95% !important;
+            max-width: 100% !important;
         }
 
         /* Card Styling */
@@ -90,24 +97,24 @@
             border: none;
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             overflow: hidden;
         }
 
         .card-header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
             border: none;
-            padding: 1.5rem !important;
+            padding: 1.2rem !important;
             font-weight: 600;
         }
 
         .card-header h2 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
 
         .card-body {
-            padding: 2rem !important;
+            padding: 1.5rem !important;
         }
 
         /* Form Controls */
@@ -115,8 +122,8 @@
         .form-select {
             border: 2px solid #e5e7eb;
             border-radius: 8px;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
         }
 
@@ -129,15 +136,21 @@
         .form-floating > .form-control,
         .form-floating > .form-select {
             border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+        }
+
+        .form-floating > label {
+            padding: 0.6rem 0.75rem;
+            font-size: 0.9rem;
         }
 
         /* Button Styling */
         .btn {
             border: none;
             border-radius: 8px;
-            padding: 0.75rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -205,7 +218,8 @@
         .table {
             margin-bottom: 0;
             border-collapse: separate;
-            border-spacing: 0 8px;
+            border-spacing: 0 6px;
+            font-size: 0.95rem;
         }
 
         .table thead th {
@@ -213,9 +227,9 @@
             border: none;
             font-weight: 600;
             color: var(--primary-color);
-            padding: 1rem;
+            padding: 0.8rem;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
         }
 
@@ -232,7 +246,7 @@
 
         .table tbody td {
             border: none;
-            padding: 1rem;
+            padding: 0.8rem;
             vertical-align: middle;
         }
 
@@ -261,39 +275,40 @@
         /* Expense Report Styling */
         .expense-report-item {
             background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-            padding: 1.5rem;
+            padding: 1rem;
             border-left: 4px solid var(--primary-color);
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .expense-report-item strong {
             color: var(--primary-color);
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .expense-summary {
             background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
             color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             text-align: center;
             box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
         }
 
         .expense-summary h3 {
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
         }
 
         /* Alert Styling */
         .alert {
             border: none;
             border-radius: 8px;
-            padding: 1rem 1.5rem;
+            padding: 0.8rem 1rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1rem;
         }
 
         .alert-success {
@@ -332,6 +347,20 @@
             background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
             margin-top: auto;
             box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem 1rem !important;
+            width: 100%;
+        }
+
+        footer .container {
+            max-width: 100%;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100%;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
         }
 
         .btn-floating {
@@ -355,12 +384,26 @@
                 font-size: 1.8rem;
             }
 
+            header p {
+                font-size: 0.95rem;
+            }
+
             .container {
-                padding: 1rem !important;
+                padding: 1.5rem 0.75rem !important;
                 margin: 1rem auto !important;
+                width: 98%;
+                border-radius: 10px;
+            }
+
+            .card {
+                margin-bottom: 1.5rem;
             }
 
             .card-body {
+                padding: 1rem !important;
+            }
+
+            .card-header {
                 padding: 1rem !important;
             }
 
@@ -370,11 +413,142 @@
 
             .table thead th,
             .table tbody td {
-                padding: 0.75rem;
+                padding: 0.6rem 0.4rem;
             }
 
-            #card_container {
-                margin-bottom: 1.5rem;
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .form-control,
+            .form-select {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.95rem;
+            }
+
+            #BillName {
+                font-size: 1.3rem;
+            }
+
+            .expense-report-item {
+                padding: 1rem;
+                margin-bottom: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            html, body {
+                min-width: 280px;
+            }
+
+            header {
+                padding: 1.5rem 0.5rem !important;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            header p {
+                font-size: 0.85rem;
+            }
+
+            .container {
+                padding: 1rem 0.5rem !important;
+                margin: 0.5rem auto !important;
+                width: 99%;
+                border-radius: 8px;
+            }
+
+            .card-body {
+                padding: 0.8rem !important;
+            }
+
+            .card-header {
+                padding: 0.8rem !important;
+            }
+
+            .card-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .table {
+                font-size: 0.8rem;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 0.5rem 0.3rem;
+            }
+
+            .form-floating > label {
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .btn-floating {
+                width: 45px;
+                height: 45px;
+            }
+
+            .expense-summary {
+                padding: 1rem;
+            }
+
+            .expense-summary h3 {
+                font-size: 1.1rem;
+            }
+
+            footer {
+                padding: 1rem 0.5rem !important;
+            }
+        }
+
+        /* Landscape orientation fixes */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                min-height: auto;
+            }
+
+            header {
+                padding: 1rem 1rem !important;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0.25rem;
+            }
+
+            header p {
+                font-size: 0.85rem;
+            }
+
+            .container {
+                margin: 0.5rem auto !important;
+                padding: 1rem 1rem !important;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+
+            .card-body {
+                padding: 0.8rem !important;
+            }
+
+            footer {
+                padding: 0.5rem 1rem !important;
+            }
+
+            .btn-floating {
+                width: 40px;
+                height: 40px;
+                font-size: 0.85rem;
             }
         }
 
@@ -405,10 +579,10 @@
 </head>
 
 <body>
-    <header class="p-5 bg-dark text-white text-center">
+    <header class="text-white text-center">
         <div class="text-center">
             <h1><i class="fas fa-receipt me-2"></i>Bill Splitter</h1>
-            <p class="mb-0" style="font-size: 1.1rem;">Split your bill, the free and smart way!</p>
+            <p class="mb-0">Split your bill, the free and smart way!</p>
         </div>
     </header>
     <div class="container">
@@ -511,7 +685,7 @@
 
                 <!-- Instagram -->
                 <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
-                    href="https://www.instagram.com/l0gan.pi" role="button" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    href="https://www.instagram.com/gaurabkjha" role="button" title="Instagram"><i class="fab fa-instagram"></i></a>
 
                 <!-- Linkedin -->
                 <a class="btn btn-floating" target="_blank" rel="noopener noreferrer"
