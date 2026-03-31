@@ -602,7 +602,7 @@
                         <div class="form-floating mb-4">
                             <select class="form-control" name="person" id="members" multiple="multiple">
                             </select>
-                            <label for="members"><i class="fas fa-users me-2"></i>Add Members</label>
+                            <!-- <label for="members"><i class="fas fa-users me-2"></i>Add Members</label> -->
                         </div>
                         <button type="button" class="btn btn-primary w-100" id="AddExpenseButton">
                             <i class="fas fa-arrow-right me-2"></i>Continue to Add Expenses
@@ -612,56 +612,7 @@
             </div>
         </div>
 
-        <!-- Add Expense Card -->
-        <div class="card">
-            <div class="card-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8 col-12">
-                        <h2 class="mb-2"><i class="fas fa-plus-circle me-2"></i><span id="BillName"></span></h2>
-                        <p class="mb-0 text-white-50"><span id="participants"></span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body" id="ExpenditureBody">
-                <div id="expendeEditor">
-                    <div class="table-responsive">
-                        <div class="table-wrapper">
-                            <form action="" id="commentForm">
-                                <fieldset>
-                                    <table id="expenseTable" class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th><i class="fas fa-user-circle me-1"></i>Paid By</th>
-                                                <th><i class="fas fa-comment me-1"></i>Description</th>
-                                                <th><i class="fas fa-rupee-sign me-1"></i>Amount</th>
-                                                <th><i class="fas fa-share-alt me-1"></i>Shared By</th>
-                                                <th><i class="fas fa-trash me-1"></i>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </fieldset>
-                            </form>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-info w-100 add-new">
-                        <i class="fas fa-plus me-2"></i>Add New Expense
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Expense Report Card -->
-        <div class="card" id="ExpenseReportCard">
-            <div class="card-header">
-                <button class="btn btn-light w-100 text-start" id="ExpenseReportButton">
-                    <i class="fas fa-chart-bar me-2"></i>View Expense Report
-                </button>
-            </div>
-            <div class="card-body" id="ExpenseReportCardBody">
-            </div>
-        </div>
+        <!-- Sections will be added dynamically by JavaScript -->
     </div>
 
 
