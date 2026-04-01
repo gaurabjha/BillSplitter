@@ -2,16 +2,12 @@
 // Bill management, sidebar, import/export functionality
 // Requires: storage.js, utils.js, settlement.js
 
-var $overlay = $('#sidebarOverlay');
-var $sidebar = $('#historySidebar');
+var $overlay;
+var $sidebar;
 
 // ============================================================
-// SIDEBAR
+// SIDEBAR FUNCTIONS (Global scope)
 // ============================================================
-$('#historyBtn').click(function () { openSidebar(); });
-$overlay.click(function () { closeSidebar(); });
-$('#sidebarClose').click(function () { closeSidebar(); });
-
 function openSidebar() {
     renderSidebar();
     $sidebar.addClass('open');
@@ -38,66 +34,35 @@ function renderSidebar() {
     var sorted = bills.slice().sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
 
     for (var i = 0; i < sorted.length; i++) {
-        var bill     = sorted[i];
+        var bill = sorted[i];
         var isActive = bill.id === currentBillId;
-        var date     = formatDate(bill.updatedAt || bill.createdAt);
-        var pList    = bill.participants ? bill.participants.join(', ') : '';
-        var txCount  = bill.settlements ? bill.settlements.length : 0;
+        var date = formatDate(bill.updatedAt || bill.createdAt);
+        var pList = bill.participants ? bill.participants.join(', ') : '';
+        var txCount = bill.settlements ? bill.settlements.length : 0;
 
         $list.append(
             '<div class="sidebar-bill-card' + (isActive ? ' active' : '') + '" data-id="' + bill.id + '">' +
-                '<div class="sbc-top">' +
-                    '<div class="sbc-name">' + escapeHtml(bill.name) + '</div>' +
-                    '<div style="display:flex;gap:4px;flex-shrink:0;">' +
-                        '<button class="sbc-export" data-id="' + bill.id + '" title="Export this bill"><i class="fas fa-download"></i></button>' +
-                        '<button class="sbc-delete" data-id="' + bill.id + '" title="Delete bill"><i class="fas fa-trash-alt"></i></button>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="sbc-id"><i class="fas fa-fingerprint"></i> ' + bill.id + '</div>' +
-                '<div class="sbc-meta">' +
-                    '<span><i class="fas fa-users"></i> ' + (bill.participants ? bill.participants.length : 0) + ' people</span>' +
-                    '<span><i class="fas fa-calendar-alt"></i> ' + date + '</span>' +
-                '</div>' +
-                '<div class="sbc-participants">' + escapeHtml(pList) + '</div>' +
-                '<div class="sbc-footer">' +
-                    '<span class="sbc-total">' + formatRs(bill.total || 0) + '</span>' +
-                    '<span class="sbc-settlements">' + txCount + ' transaction' + (txCount !== 1 ? 's' : '') + '</span>' +
-                '</div>' +
+            '<div class="sbc-top">' +
+            '<div class="sbc-name">' + escapeHtml(bill.name) + '</div>' +
+            '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+            '<button class="sbc-export" data-id="' + bill.id + '" title="Export this bill"><i class="fas fa-download"></i></button>' +
+            '<button class="sbc-delete" data-id="' + bill.id + '" title="Delete bill"><i class="fas fa-trash-alt"></i></button>' +
+            '</div>' +
+            '</div>' +
+            '<div class="sbc-id"><i class="fas fa-fingerprint"></i> ' + bill.id + '</div>' +
+            '<div class="sbc-meta">' +
+            '<span><i class="fas fa-users"></i> ' + (bill.participants ? bill.participants.length : 0) + ' people</span>' +
+            '<span><i class="fas fa-calendar-alt"></i> ' + date + '</span>' +
+            '</div>' +
+            '<div class="sbc-participants">' + escapeHtml(pList) + '</div>' +
+            '<div class="sbc-footer">' +
+            '<span class="sbc-total">' + formatRs(bill.total || 0) + '</span>' +
+            '<span class="sbc-settlements">' + txCount + ' transaction' + (txCount !== 1 ? 's' : '') + '</span>' +
+            '</div>' +
             '</div>'
         );
     }
 }
-
-// Delete bill
-$(document).on('click', '.sbc-delete', function (e) {
-    e.stopPropagation();
-    var id = $(this).data('id');
-    if (!confirm('Delete this saved bill?')) return;
-    var bills    = loadAllBills();
-    var filtered = [];
-    for (var i = 0; i < bills.length; i++) {
-        if (bills[i].id !== id) filtered.push(bills[i]);
-    }
-    saveAllBills(filtered);
-    if (currentBillId === id) { currentBillId = null; }
-    renderSidebar();
-});
-
-// Load bill from sidebar
-$(document).on('click', '.sidebar-bill-card', function (e) {
-    if ($(e.target).closest('.sbc-delete').length) return;
-
-    var id    = $(this).data('id');
-    var bills = loadAllBills();
-    var bill  = null;
-    for (var i = 0; i < bills.length; i++) {
-        if (bills[i].id === id) { bill = bills[i]; break; }
-    }
-    if (!bill) return;
-
-    closeSidebar();
-    loadBillIntoPage(bill);
-});
 
 function loadBillIntoPage(bill) {
     // 1. Reset meta card with bill name + participants pre-filled
@@ -133,133 +98,21 @@ function loadBillIntoPage(bill) {
 }
 
 // ============================================================
-// EXPORT / IMPORT
+// EXPORT / IMPORT FUNCTIONS (Global scope)
 // ============================================================
-
-// Download a single bill as JSON
 function exportBillAsJSON(bill) {
     var payload = JSON.stringify(bill, null, 2);
-    var blob    = new Blob([payload], { type: 'application/json' });
-    var url     = URL.createObjectURL(blob);
-    var a       = document.createElement('a');
+    var blob = new Blob([payload], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     var safeName = (bill.name || 'bill').replace(/[^a-z0-9]+/gi, '_').toLowerCase();
-    a.href     = url;
+    a.href = url;
     a.download = 'billsplitter_' + safeName + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
-
-// Export all saved bills as a single JSON file
-$('#exportAllBtn').click(function () {
-    var bills = loadAllBills();
-    if (bills.length === 0) { alert('No saved bills to export.'); return; }
-    var payload = JSON.stringify({ version: 1, exported: Date.now(), bills: bills }, null, 2);
-    var blob    = new Blob([payload], { type: 'application/json' });
-    var url     = URL.createObjectURL(blob);
-    var a       = document.createElement('a');
-    a.href      = url;
-    a.download  = 'billsplitter_all_' + new Date().toISOString().slice(0,10) + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Exported ' + bills.length + ' bill' + (bills.length !== 1 ? 's' : ''), 'green');
-});
-
-// Export current (active) bill
-$('#exportCurrentBtn').click(function () {
-    var data = collectBillData();
-    if (!currentBillId || data.expenses.length === 0) {
-        alert('Generate a settlement first before exporting.');
-        return;
-    }
-    var bills = loadAllBills();
-    var bill  = null;
-    for (var i = 0; i < bills.length; i++) {
-        if (bills[i].id === currentBillId) { bill = bills[i]; break; }
-    }
-    if (!bill) {
-        // Hasn't been saved yet - build it on the fly
-        var algo = runSettlement(data);
-        bill = {
-            id: currentBillId, name: data.name, participants: data.participants,
-            expenses: data.expenses, total: data.total, settlements: algo.results,
-            createdAt: Date.now(), updatedAt: Date.now()
-        };
-    }
-    exportBillAsJSON(bill);
-    showToast('Bill exported', 'green');
-});
-
-// Share: copy a plain-text settlement summary to clipboard
-$('#shareCurrentBtn').click(function () {
-    var data = collectBillData();
-    if (data.expenses.length === 0) { alert('No expenses to share yet.'); return; }
-    var algo = runSettlement(data);
-    var lines = [];
-    lines.push('=== ' + data.name + ' ===');
-    lines.push('Participants: ' + data.participants.join(', '));
-    lines.push('');
-    lines.push('Expenses:');
-    for (var e = 0; e < data.expenses.length; e++) {
-        var exp = data.expenses[e];
-        lines.push('  ' + (exp.desc || 'Expense') + ' - ' + formatRs(exp.amount) + ' paid by ' + exp.payee + ' (shared by ' + exp.paidFor.join(', ') + ')');
-    }
-    lines.push('');
-    lines.push('Settlement:');
-    if (algo.results.length === 0) {
-        lines.push('  All settled! No payments needed.');
-    } else {
-        for (var r = 0; r < algo.results.length; r++) {
-            var s = algo.results[r];
-            lines.push('  ' + s.from + ' pays ' + formatRs(s.amount) + ' to ' + s.to);
-        }
-    }
-    var text = lines.join('\n');
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () {
-            showToast('Copied to clipboard!', 'accent');
-        }, function () {
-            fallbackCopy(text);
-        });
-    } else {
-        fallbackCopy(text);
-    }
-});
-
-// Per-bill export from sidebar
-$(document).on('click', '.sbc-export', function (e) {
-    e.stopPropagation();
-    var id    = $(this).data('id');
-    var bills = loadAllBills();
-    for (var i = 0; i < bills.length; i++) {
-        if (bills[i].id === id) { exportBillAsJSON(bills[i]); break; }
-    }
-    showToast('Bill exported', 'green');
-});
-
-// Import: open file picker
-$('#importBillBtn, #importLink').click(function (e) {
-    e.preventDefault();
-    $('#importFileInput').val('').click();
-});
-
-$('#importFileInput').on('change', function () {
-    var file = this.files && this.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-        try {
-            var parsed = JSON.parse(ev.target.result);
-            importParsed(parsed);
-        } catch(err) {
-            alert('Could not read the file. Make sure it is a valid BillSplitter JSON export.');
-        }
-    };
-    reader.readAsText(file);
-});
 
 function importParsed(parsed) {
     // Accept either a single bill object or an { bills: [...] } bundle
@@ -312,7 +165,7 @@ function importParsed(parsed) {
     openSidebar();
 
     var msg = '';
-    if (added > 0)   msg += added + ' bill' + (added !== 1 ? 's' : '') + ' imported. ';
+    if (added > 0) msg += added + ' bill' + (added !== 1 ? 's' : '') + ' imported. ';
     if (updated > 0) msg += updated + ' bill' + (updated !== 1 ? 's' : '') + ' updated.';
     showToast(msg.trim() || 'Nothing to import.', 'green');
 
@@ -323,3 +176,159 @@ function importParsed(parsed) {
         setTimeout(function () { loadBillIntoPage(bill); }, 300);
     }
 }
+
+// ============================================================
+// EVENT HANDLERS (Document ready)
+// ============================================================
+$(document).ready(function () {
+
+    $overlay = $('#sidebarOverlay');
+    $sidebar = $('#historySidebar');
+
+    // Sidebar handlers
+    $('#historyBtn').click(function () { openSidebar(); });
+    $overlay.click(function () { closeSidebar(); });
+    $('#sidebarClose').click(function () { closeSidebar(); });
+
+    // Delete bill
+    $(document).on('click', '.sbc-delete', function (e) {
+        e.stopPropagation();
+        var id = $(this).data('id');
+        if (!confirm('Delete this saved bill?')) return;
+        var bills = loadAllBills();
+        var filtered = [];
+        for (var i = 0; i < bills.length; i++) {
+            if (bills[i].id !== id) filtered.push(bills[i]);
+        }
+        saveAllBills(filtered);
+        if (currentBillId === id) { currentBillId = null; }
+        renderSidebar();
+    });
+
+    // Load bill from sidebar
+    $(document).on('click', '.sidebar-bill-card', function (e) {
+        if ($(e.target).closest('.sbc-delete').length) return;
+
+        var id = $(this).data('id');
+        var bills = loadAllBills();
+        var bill = null;
+        for (var i = 0; i < bills.length; i++) {
+            if (bills[i].id === id) { bill = bills[i]; break; }
+        }
+        if (!bill) return;
+
+        closeSidebar();
+        loadBillIntoPage(bill);
+    });
+
+    // Export all saved bills as a single JSON file
+    $('#exportAllBtn').click(function () {
+        var bills = loadAllBills();
+        if (bills.length === 0) { alert('No saved bills to export.'); return; }
+        var payload = JSON.stringify({ version: 1, exported: Date.now(), bills: bills }, null, 2);
+        var blob = new Blob([payload], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'billsplitter_all_' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Exported ' + bills.length + ' bill' + (bills.length !== 1 ? 's' : ''), 'green');
+    });
+
+    // Export current (active) bill
+    $('#exportCurrentBtn').click(function () {
+        var data = collectBillData();
+        if (!currentBillId || data.expenses.length === 0) {
+            alert('Generate a settlement first before exporting.');
+            return;
+        }
+        var bills = loadAllBills();
+        var bill = null;
+        for (var i = 0; i < bills.length; i++) {
+            if (bills[i].id === currentBillId) { bill = bills[i]; break; }
+        }
+        if (!bill) {
+            // Hasn't been saved yet - build it on the fly
+            var algo = runSettlement(data);
+            bill = {
+                id: currentBillId, name: data.name, participants: data.participants,
+                expenses: data.expenses, total: data.total, settlements: algo.results,
+                createdAt: Date.now(), updatedAt: Date.now()
+            };
+        }
+        exportBillAsJSON(bill);
+        showToast('Bill exported', 'green');
+    });
+
+    // Share: copy a plain-text settlement summary to clipboard
+    $('#shareCurrentBtn').click(function () {
+        var data = collectBillData();
+        if (data.expenses.length === 0) { alert('No expenses to share yet.'); return; }
+        var algo = runSettlement(data);
+        var lines = [];
+        lines.push('=== ' + data.name + ' ===');
+        lines.push('Participants: ' + data.participants.join(', '));
+        lines.push('');
+        lines.push('Expenses:');
+        for (var e = 0; e < data.expenses.length; e++) {
+            var exp = data.expenses[e];
+            lines.push('  ' + (exp.desc || 'Expense') + ' - ' + formatRs(exp.amount) + ' paid by ' + exp.payee + ' (shared by ' + exp.paidFor.join(', ') + ')');
+        }
+        lines.push('');
+        lines.push('Settlement:');
+        if (algo.results.length === 0) {
+            lines.push('  All settled! No payments needed.');
+        } else {
+            for (var r = 0; r < algo.results.length; r++) {
+                var s = algo.results[r];
+                lines.push('  ' + s.from + ' pays ' + formatRs(s.amount) + ' to ' + s.to);
+            }
+        }
+        var text = lines.join('\n');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+                showToast('Copied to clipboard!', 'accent');
+            }, function () {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    });
+
+    // Per-bill export from sidebar
+    $(document).on('click', '.sbc-export', function (e) {
+        e.stopPropagation();
+        var id = $(this).data('id');
+        var bills = loadAllBills();
+        for (var i = 0; i < bills.length; i++) {
+            if (bills[i].id === id) { exportBillAsJSON(bills[i]); break; }
+        }
+        showToast('Bill exported', 'green');
+    });
+
+    // Import: open file picker
+    $('#importBillBtn, #importLink').click(function (e) {
+        e.preventDefault();
+        $('#importFileInput').val('').click();
+    });
+
+    $('#importFileInput').on('change', function () {
+        var file = this.files && this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+            try {
+                var parsed = JSON.parse(ev.target.result);
+                importParsed(parsed);
+            } catch (err) {
+                alert('Could not read the file. Make sure it is a valid BillSplitter JSON export.');
+            }
+        };
+        reader.readAsText(file);
+    });
+
+}); // End of $(document).ready()
