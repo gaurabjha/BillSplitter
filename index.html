@@ -44,6 +44,25 @@
             --radius-sm:    8px;
         }
 
+        :root.light-theme {
+            --bg:           #f8f9fa;
+            --surface:      #ffffff;
+            --surface2:     #f1f3f5;
+            --border:       #e0e0e0;
+            --accent:       #7c6af7;
+            --accent-light: #6d5be8;
+            --accent-glow:  rgba(124,106,247,0.12);
+            --green:        #3ecf8e;
+            --green-dim:    rgba(62,207,142,0.1);
+            --red:          #f06a6a;
+            --red-dim:      rgba(240,106,106,0.08);
+            --text:         #1a1a1a;
+            --text-muted:   #666666;
+            --text-dim:     #999999;
+            --radius:       14px;
+            --radius-sm:    8px;
+        }
+
         *, *::before, *::after { box-sizing: border-box; }
 
         html, body {
@@ -498,6 +517,26 @@
             .app-wrapper { margin: 18px auto; }
             .bs-card-body { padding: 16px; }
         }
+
+        /* ── THEME TOGGLE ──────────────────────── */
+        .theme-toggle {
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+            color: var(--accent-light);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 12px;
+        }
+        .theme-toggle:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
     </style>
 </head>
 
@@ -511,6 +550,10 @@
         <p>Split smarter, settle faster</p>
     </div>
     <span class="header-badge">&#10022; Free &amp; Open Source</span>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <span id="themeLabel">Dark</span>
+    </button>
 </header>
 
 <!-- ══ APP ══════════════════════════════════════════════════════════════ -->
@@ -643,6 +686,46 @@
     </div>
     <div>&copy; 2026 <a href="https://github.com/gaurabjha">Gaurab Jha</a> &middot; BillSplitter</div>
 </footer>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeLabel = document.getElementById('themeLabel');
+    const htmlElement = document.documentElement;
+
+    // Initialize theme from localStorage or system preference
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('billsplitter-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        
+        applyTheme(theme);
+    }
+
+    // Apply theme to the document
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            htmlElement.classList.add('light-theme');
+            themeToggle.querySelector('i').className = 'fas fa-sun';
+            themeLabel.textContent = 'Light';
+        } else {
+            htmlElement.classList.remove('light-theme');
+            themeToggle.querySelector('i').className = 'fas fa-moon';
+            themeLabel.textContent = 'Dark';
+        }
+        localStorage.setItem('billsplitter-theme', theme);
+    }
+
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = htmlElement.classList.contains('light-theme') ? 'light' : 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+    });
+
+    // Initialize on page load
+    initializeTheme();
+</script>
 
 </body>
 </html>
