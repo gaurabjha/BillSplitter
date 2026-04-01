@@ -3,12 +3,12 @@
 
 $(document).ready(function () {
 
-    // ── State ─────────────────────────────────────────────────────────────
+    // -- State 
     var participants = [];
     var participantsOptionsSelected = '';
     var participantsOptions = '';
 
-    // ── Helpers ───────────────────────────────────────────────────────────
+    // -- Helpers 
     var avatarColors = ['av-0', 'av-1', 'av-2', 'av-3', 'av-4'];
 
     function avatarClass(name) {
@@ -36,7 +36,7 @@ $(document).ready(function () {
         });
     }
 
-    // ── Select2: Members input ─────────────────────────────────────────────
+    // -- Select2: Members input 
     $('#members').select2({
         placeholder: 'Type a name and press Enter\u2026',
         tags: true,
@@ -45,7 +45,7 @@ $(document).ready(function () {
         dropdownParent: $('body')
     });
 
-    // ── Build a new expense row ────────────────────────────────────────────
+    // -- Build a new expense row 
     function newColumn() {
         var row = '<tr>' +
             '<td>' +
@@ -85,13 +85,13 @@ $(document).ready(function () {
         updateSummaryBar();
     }
 
-    // ── Delete row ────────────────────────────────────────────────────────
+    // -- Delete row 
     $(document).on('click', '.delete', function () {
         $(this).closest('tr').remove();
         updateSummaryBar();
     });
 
-    // ── Live summary bar ──────────────────────────────────────────────────
+    // -- Live summary bar 
     $(document).on('change keyup', '.amount-input', function () {
         updateSummaryBar();
     });
@@ -139,7 +139,7 @@ $(document).ready(function () {
         $('#summaryBar').html(html).removeClass('hidden');
     }
 
-    // ── "Continue to Add Expenses" button ────────────────────────────────
+    // -- "Continue to Add Expenses" button 
     $('#AddExpenseButton').click(function () {
         var billName = $('#meta-bill-name').val().trim();
         participants = $('#members :selected').map(function (_, e) { return e.value; }).get();
@@ -176,19 +176,19 @@ $(document).ready(function () {
         newColumn();
     });
 
-    // ── Add new expense row ───────────────────────────────────────────────
+    // -- Add new expense row 
     $(document).on('click', '.add-new', function () {
         newColumn();
     });
 
-    // ── Reset / Start Over ────────────────────────────────────────────────
+    // -- Reset / Start Over 
     $('#resetBtn').click(function () {
         if (confirm('Start over? All expenses will be cleared.')) {
             location.reload();
         }
     });
 
-    // ── Calculate Settlement ──────────────────────────────────────────────
+    // -- Calculate Settlement 
     $('#ExpenseReportButton').click(function () {
 
         // Advance steps
@@ -233,10 +233,10 @@ $(document).ready(function () {
             }
         });
 
-        // Run algorithm — returns array of { from, to, amount }
+        // Run algorithm - returns array of { from, to, amount }
         var results = calculate(graph, participants);
 
-        // ── Build report HTML ──────────────────────────────────────────
+        // -- Build report HTML 
         var html = '';
 
         // Per-person totals
@@ -268,10 +268,14 @@ $(document).ready(function () {
                 var avTo   = avatarClass(s.to);
                 var delay  = (r * 0.07) + 's';
                 html += '<div class="settlement-item" style="animation-delay:' + delay + '">' +
-                    '<div class="settlement-avatar ' + avFrom + '">' + initials(s.from) + '</div>' +
-                    '<div class="settlement-text"><span>' + s.from + '</span> pays <span>' + s.to + '</span></div>' +
-                    '<div class="settlement-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>' +
-                    '<div class="settlement-avatar ' + avTo + '">' + initials(s.to) + '</div>' +
+                    '<div class="settlement-info">' +
+                        '<div class="settlement-avatar ' + avFrom + '">' + initials(s.from) + '</div>' +
+                        '<div class="settlement-text">' +
+                            '<strong>' + s.from + '</strong>' +
+                            '<i class="fas fa-arrow-right settlement-arrow"></i>' +
+                            '<strong>' + s.to + '</strong>' +
+                        '</div>' +
+                    '</div>' +
                     '<div class="settlement-amount">' + formatRs(s.amount) + '</div>' +
                 '</div>';
             }
