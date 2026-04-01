@@ -27,10 +27,16 @@ Styling:            CSS3 + Bootstrap Classes
 BillSplitter/
 ├── index.html                          # Main application page
 ├── README.md                           # Project documentation
+├── PROJECT_CONTEXT.md                  # Project structure & documentation
 ├── resources/
 │   ├── js/
-│   │   ├── AddExpense.js              # Expense management logic
-│   │   └── split_algo.js              # Bill settlement algorithm
+│   │   ├── split_algo.js              # Bill settlement algorithm
+│   │   ├── storage.js                 # Persistence & localStorage management
+│   │   ├── utils.js                   # Utility functions & helpers
+│   │   ├── expenseTable.js            # Expense table row management
+│   │   ├── settlement.js              # Settlement calculation & rendering
+│   │   ├── billManagement.js          # Sidebar, import/export functionality
+│   │   └── AddExpense.js              # Main orchestration & state management
 │   └── images/
 │       └── logo_info.txt
 ├── .git/                              # Git version control
@@ -111,32 +117,205 @@ BillSplitter/
 
 ---
 
-## ⚙️ JavaScript Logic
+## ⚙️ JavaScript Logic - Modularized Architecture
 
-### `AddExpense.js` - Main Application Logic
+### Overview
+The application is organized into 7 focused JavaScript modules, each with a single clear responsibility. This modular design improves maintainability and enables independent testing and updating.
 
-#### Key Functions:
+### Module Dependencies & Load Order
+Scripts are loaded in this order in `index.html`:
+```
+1. split_algo.js          → Settlement algorithm (no dependencies)
+2. storage.js             → Persistence layer
+3. utils.js               → Utility functions (depends on formatRs, etc.)
+4. expenseTable.js        → Expense row management (depends on utils.js, global state)
+5. settlement.js          → Settlement calculations (depends on utils.js, split_algo.js)
+6. billManagement.js      → Sidebar & file ops (depends on storage.js, settlement.js, utils.js)
+7. AddExpense.js          → Main orchestration (depends on all above modules)
+```
 
-**1. `newColumn()`**
-- Creates a new expense row in the table
-- Initializes Select2 dropdowns for payee and paidFor selections
-- Dynamically binds click handlers to delete buttons
+---
 
-**2. `$("#AddExpenseButton").click()`**
-- Validates bill name and participant selection
-- Generates participant options for all future dropdowns
-- Hides bill details card, shows expense entry card
-- Adds first expense row
+### Module Details
 
-**3. `$("#ExpenseReportButton").click()`**
-- Collects all expense data from table rows
-- Creates adjacency matrix (graph) representing payment flows
-- Calls `calculate()` function with the graph
-- Displays settlement report
+#### **1. `storage.js` - Persistence & Storage Management**
 
-**4. Delete Row Handler**
-- Removes row from DOM when delete button clicked
-- Uses event delegation for dynamically added rows
+**Purpose:** Encapsulates all localStorage operations and bill data persistence.
+
+**Key Functions:**
+```javascript
+storageGet(key)                  // Safely get value from localStorage
+storageSet(key, val)             // Safely set value in localStorage
+loadAllBills()                   // Retrieve all saved bills as array
+saveAllBills(bills)              // Persist bills array to storage
+makeBillId(name)                 // Generate unique ID from bill name (slug format)
+```
+
+**Data Structure:**
+```javascript
+Bill Object:
+{
+  id: "bill__dinner_2024",
+  name: "Dinner",
+  participants: ["Alice", "Bob", "Charlie"],
+  expenses: [
+    { payee: "Alice", desc: "Appetizers", amount: 300, paidFor: ["Alice", "Bob"] },
+    ...
+  ],
+  total: 1050,
+  settlements: [...]             // Results from split_algo
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+---
+
+#### **2. `utils.js` - Utility Functions & Helpers**
+
+**Purpose:** Reusable utility functions for formatting, styling, and user feedback.
+
+**Key Functions:**
+```javascript
+avatarClass(name)                // Map name to avatar color class (av-0 through av-4)
+initials(name)                   // Extract initials from name (max 2 chars)
+formatRs(n)                      // Format number as Indian Rupees (₹ symbol)
+formatDate(ts)                   // Format timestamp to "DD MMM YYYY"
+escapeHtml(str)                  // Prevent XSS by escaping HTML characters
+fallbackCopy(text)               // Fallback copy-to-clipboard for older browsers
+showToast(msg, type)             // Display confirmation toast (green/accent colors)
+```
+
+**Avatar Colors:** `['av-0', 'av-1', 'av-2', 'av-3', 'av-4']` distributed by character code sum
+
+---
+
+#### **3. `expenseTable.js` - Expense Table Management**
+
+**Purpose:** Handle dynamic expense row creation, deletion, and summary calculations.
+
+**Key Functions:**
+```javascript
+newColumn(data)                  // Create new expense row, optionally restore saved data
+updateSummaryBar()               // Recalculate and display total paid by each person
+```
+
+**Event Handlers:**
+```javascript
+.delete button click             // Remove row from table
+.amount-input change/keyup       // Update summary bar on amount change
+.add-new button click            // Trigger newColumn()
+```
+
+**Summary Bar Display:**
+- Shows each participant's total payments
+- Calculates grand total across all expenses
+- Automatically hides if grand total is ₹0
+
+---
+
+#### **4. `settlement.js` - Settlement Calculations & Rendering**
+
+**Purpose:** Collect expense data, calculate settlements, and generate HTML reports.
+
+**Key Functions:**
+```javascript
+collectBillData()                // Extract all valid expenses from table rows
+                                 // Returns: { name, participants, expenses[], total }
+
+runSettlement(data)              // Run minimum cash flow algorithm
+                                 // Returns: { results: [...], spent: {...} }
+
+buildSettlementHTML(data, results, spent)
+  // Generate HTML report with:
+  // - Total Paid Per Person cards
+  // - Settlement transaction list with avatars
+  // - "All settled!" message if no debts
+```
+
+**Settlement Output Format:**
+```javascript
+{
+  from: "Alice",
+  to: "Bob",
+  amount: 150
+}
+```
+
+---
+
+#### **5. `billManagement.js` - Bill Sidebar, Import/Export**
+
+**Purpose:** Manage bill history, import/export functionality, sidebar UI.
+
+**Sidebar Functions:**
+```javascript
+openSidebar()                    // Display bill history sidebar overlay
+closeSidebar()                   // Hide sidebar
+renderSidebar()                  // Populate sidebar with saved bills list
+loadBillIntoPage(bill)           // Load selected bill for editing
+```
+
+**Export Functions:**
+```javascript
+exportBillAsJSON(bill)           // Download single bill as JSON file
+$('#exportAllBtn').click()       // Export all bills as bundle
+$('#exportCurrentBtn').click()   // Export current active bill
+$('#shareCurrentBtn').click()    // Copy plain-text settlement to clipboard
+```
+
+**Import Functions:**
+```javascript
+importParsed(parsed)             // Process imported JSON (single or bundle)
+                                 // Handles: file import, validation, merge/update logic
+```
+
+**Sidebar Bill Card Display:**
+- Bill name with active indicator
+- Fingerprint icon with unique ID
+- Participant count and last updated date
+- Total amount and transaction count
+- Export and delete buttons
+
+---
+
+#### **6. `AddExpense.js` - Main Orchestration & State Management**
+
+**Purpose:** Orchestrate overall workflow, manage global state, handle UI transitions.
+
+**Global State Variables:**
+```javascript
+var participants = []                  // Current participants list
+var participantsOptionsSelected = ''   // HTML options for multi-select (all selected)
+var participantsOptions = ''           // HTML options for payee dropdown
+var currentBillId = null               // ID of currently active bill
+```
+
+**Key Functions:**
+```javascript
+activateExpensePhase(billName, pts, existingExpenses)
+  // Transition from bill setup to expense entry
+  // Initialize participant options for dropdowns
+  // Show expense table, hide bill details
+
+updateBillIdBadge()              // Display unique bill ID in card header
+
+persistBill(data, algo)          // Save bill to storage after settlement
+
+showAutosaveToast()              // Display "Auto-saved" confirmation
+```
+
+**Main Workflow Handlers:**
+```javascript
+$('#AddExpenseButton').click()   // Step 1→2: Continue button
+$('#ExpenseReportButton').click() // Step 2→3: Generate settlement
+$('#resetBtn').click()           // Reset to initial state (reload page)
+```
+
+**UI Step Indicators:**
+- Step 1: Bill Details (input bill name & participants)
+- Step 2: Add Expenses (enter transaction details)
+- Step 3: View Report (settlement results)
 
 ---
 
@@ -247,7 +426,20 @@ Output:
 
 ## 🔧 Current State & Improvements Made
 
-### Recent Enhancements:
+### Recent Architecture Refactoring (April 2026)
+✅ **Modularized AddExpense.js** - Split monolithic 900+ line file into 6 focused modules:
+  - storage.js (persistence layer)
+  - utils.js (formatting & helpers)
+  - expenseTable.js (table management)
+  - settlement.js (calculations & rendering)
+  - billManagement.js (sidebar & import/export)
+  - AddExpense.js (orchestration)
+
+✅ **Improved Code Maintainability** - Each module has single responsibility
+✅ **Better Testing Capability** - Individual modules can be tested independently
+✅ **Cleaner Dependencies** - Clear module dependency chain
+
+### Previous Enhancements:
 ✅ Fixed paidFor selector bug (each expense uses correct row data)
 ✅ Improved bill settlement calculations
 ✅ Dynamic expense entry system
@@ -357,5 +549,5 @@ Expected: No settlement needed for that person
 
 ---
 
-*Last Updated: April 2026*
+*Last Updated: April 1, 2026 - Architecture Refactoring & Modularization*
 *Project Status: Active Development*
